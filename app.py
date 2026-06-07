@@ -1,3 +1,4 @@
+
 import streamlit as st
 import pandas as pd
 from sklearn.feature_extraction.text import TfidfVectorizer
@@ -7,12 +8,18 @@ import numpy as np
 
 st.set_page_config(
     page_title="Movie Recommendation System",
+    page_icon="🎬",
     layout="centered"
 )
 
 @st.cache_data
 def load_data():
-    dataset = pd.read_csv("movies_metadata.csv")
+    dataset = pd.read_csv(
+        "movies_metadata.csv",
+        usecols=["original_title", "genres", "original_language"],
+        low_memory=False,
+        nrows=3000
+    )
 
     dataset = dataset[dataset["original_language"] == "en"].copy()
 
@@ -60,7 +67,10 @@ def movie_recommendation(movie_name, top_rec):
     return recommendations
 
 st.title("🎬 Movie Recommendation System")
-st.write("Find movies with similar genres using TF-IDF Vectorizer and Cosine Similarity.")
+
+st.write(
+    "Find movies with similar genres using TF-IDF Vectorizer and Cosine Similarity."
+)
 
 movie_list = sorted(similarity_df.index.tolist())
 
@@ -82,7 +92,9 @@ if st.button("Recommend"):
     if result is None:
         st.error("Movie not found!")
     else:
-        st.subheader(f"Top {top_n} movies similar to '{selected_movie}'")
+        st.subheader(
+            f"Top {top_n} movies similar to '{selected_movie}'"
+        )
 
         st.dataframe(
             result.to_frame(name="Similarity (%)"),
@@ -91,10 +103,17 @@ if st.button("Recommend"):
 
         st.bar_chart(result)
 
-        st.success(f"Most similar movie: {result.index[0]}")
+        st.success(
+            f"Most similar movie: {result.index[0]}"
+        )
 
 with st.expander("🔍 Show Movie Dataset"):
-    st.dataframe(movies_df.head(100), use_container_width=True)
+    st.dataframe(
+        movies_df.head(100),
+        use_container_width=True
+    )
 
 st.markdown("---")
-st.caption("Built with Streamlit | Content-Based Movie Recommendation System")
+st.caption(
+    "Built with Streamlit | Content-Based Movie Recommendation System"
+)
